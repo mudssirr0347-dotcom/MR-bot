@@ -1,0 +1,452 @@
+<script>
+const CONFIG = {
+  brandName: "𝗠𝗥 𝗕𝗼𝘁",
+  bannerImageUrl: "",
+  ownerNumber: "03443034858",
+  ownerName: "𝗠𝘂𝗱𝗮𝘀𝗶𝗿 𝗔𝗵𝗺𝗲𝗱",
+  apiBaseUrl: "https://web-production-4abfe.up.railway.app"
+};
+</script>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080b12">
+  <meta name="description" content="Pair your WhatsApp account with the bot.">
+  <title>WhatsApp Pairing</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080b12;
+      --panel: #101621;
+      --panel-2: #151e2c;
+      --line: rgba(164, 184, 214, .14);
+      --text: #f4f7fb;
+      --muted: #8e9bad;
+      --accent: #8b7cff;
+      --accent-2: #54d6c5;
+      --danger: #ff7185;
+      --success: #54d6a0;
+      --radius: 22px;
+    }
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 50% -15%, rgba(111, 91, 255, .20), transparent 42%),
+        radial-gradient(ellipse at 100% 55%, rgba(39, 181, 171, .08), transparent 35%),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input { font: inherit; }
+    a { color: inherit; }
+    .shell { width: min(100% - 32px, 480px); margin: 0 auto; padding: 34px 0 28px; }
+    .topline { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:28px; }
+    .brand { min-width:0; display:flex; align-items:center; gap:12px; }
+    .brand-mark {
+      width:44px; height:44px; flex:0 0 44px; display:grid; place-items:center;
+      border:1px solid rgba(255,255,255,.12); border-radius:15px;
+      background:linear-gradient(145deg, rgba(139,124,255,.24), rgba(84,214,197,.10));
+      color:#c9c1ff; font-size:20px; font-weight:800;
+      box-shadow:0 8px 28px rgba(0,0,0,.22);
+    }
+    .brand-copy { min-width:0; }
+    .eyebrow { color:var(--muted); font-size:10px; font-weight:800; letter-spacing:.19em; text-transform:uppercase; }
+    .brand-name { margin-top:3px; overflow-wrap:anywhere; font-size:19px; line-height:1.2; font-weight:800; letter-spacing:-.035em; }
+    .status {
+      display:inline-flex; align-items:center; gap:7px; flex:0 0 auto;
+      padding:8px 10px; border:1px solid var(--line); border-radius:999px;
+      color:var(--muted); background:rgba(255,255,255,.025); font-size:11px; font-weight:700;
+    }
+    .dot { width:7px; height:7px; border-radius:50%; background:#687386; box-shadow:0 0 0 4px rgba(104,115,134,.12); }
+    .status.online { color:#9be9c6; border-color:rgba(84,214,160,.2); }
+    .status.online .dot { background:var(--success); box-shadow:0 0 0 4px rgba(84,214,160,.12); }
+    .status.offline { color:#ff9baa; border-color:rgba(255,113,133,.2); }
+    .status.offline .dot { background:var(--danger); box-shadow:0 0 0 4px rgba(255,113,133,.12); }
+    .intro { margin:0 0 23px; }
+    .intro h1 { margin:0; font-size:clamp(29px, 8vw, 39px); line-height:1.08; letter-spacing:-.055em; font-weight:850; }
+    .intro p { margin:11px 0 0; color:var(--muted); font-size:14px; line-height:1.65; }
+    .stats {
+      display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-bottom:18px;
+    }
+    .stat {
+      min-width:0; padding:15px; border:1px solid var(--line); border-radius:17px;
+      background:linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.018));
+    }
+    .stat-label { color:var(--muted); font-size:11px; font-weight:650; }
+    .stat-value { margin-top:8px; font-size:25px; line-height:1; font-weight:800; letter-spacing:-.04em; font-variant-numeric:tabular-nums; }
+    .panel {
+      padding:21px; border:1px solid rgba(164,184,214,.16); border-radius:var(--radius);
+      background:linear-gradient(155deg, rgba(20,29,43,.98), rgba(13,19,29,.98));
+      box-shadow:0 24px 70px rgba(0,0,0,.30);
+    }
+    .panel-heading { display:flex; align-items:center; gap:11px; margin-bottom:7px; }
+    .panel-icon {
+      width:38px; height:38px; display:grid; place-items:center; flex:0 0 38px;
+      border-radius:13px; color:#c9c1ff; background:rgba(139,124,255,.14); font-size:18px;
+    }
+    .panel h2 { margin:0; font-size:17px; letter-spacing:-.025em; }
+    .panel-sub { margin:0 0 19px 49px; color:var(--muted); font-size:12px; line-height:1.5; }
+    .field-label { display:block; margin:0 0 8px; color:#c5cedb; font-size:12px; font-weight:700; }
+    .phone-row { display:grid; grid-template-columns:100px minmax(0,1fr); gap:9px; }
+    .input-wrap {
+      min-width:0; display:flex; align-items:center; height:53px;
+      border:1px solid rgba(164,184,214,.17); border-radius:13px;
+      background:rgba(5,9,15,.52); transition:border-color .2s, box-shadow .2s;
+    }
+    .input-wrap:focus-within { border-color:rgba(139,124,255,.75); box-shadow:0 0 0 3px rgba(139,124,255,.12); }
+    .prefix { padding-left:13px; color:var(--muted); font-size:14px; }
+    input {
+      width:100%; min-width:0; height:100%; padding:0 13px; border:0; outline:0;
+      color:var(--text); background:transparent; font-size:15px;
+    }
+    .prefix + input { padding-left:5px; }
+    input::placeholder { color:#5f6b7d; }
+    .hint { margin:9px 0 17px; color:#738095; font-size:11px; line-height:1.5; }
+    .primary {
+      width:100%; min-height:53px; display:flex; align-items:center; justify-content:center; gap:9px;
+      border:0; border-radius:14px; color:#fff; cursor:pointer; font-size:14px; font-weight:800;
+      background:linear-gradient(105deg, #7667f4, #8d78ff 55%, #6e8cfb);
+      box-shadow:0 10px 28px rgba(119,103,244,.24); transition:transform .15s, opacity .2s, filter .2s;
+    }
+    .primary:active { transform:scale(.985); }
+    .primary:disabled { opacity:.58; cursor:wait; }
+    .spinner { width:15px; height:15px; border:2px solid rgba(255,255,255,.35); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .result {
+      display:none; margin-top:17px; padding:17px; border:1px solid rgba(84,214,197,.22);
+      border-radius:16px; background:rgba(84,214,197,.055);
+    }
+    .result.visible { display:block; }
+    .result-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .result-title { color:#a9e9db; font-size:11px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; }
+    .timer { color:var(--muted); font-size:11px; font-variant-numeric:tabular-nums; }
+    .code {
+      margin:13px 0; text-align:center; color:#fff; font-size:clamp(30px, 9vw, 39px);
+      font-weight:850; letter-spacing:.13em; font-variant-numeric:tabular-nums;
+    }
+    .copy {
+      width:100%; min-height:42px; border:1px solid rgba(84,214,197,.25); border-radius:11px;
+      color:#a9e9db; background:rgba(84,214,197,.09); font-size:12px; font-weight:800; cursor:pointer;
+    }
+    .result-note { margin:11px 0 0; color:var(--muted); font-size:11px; line-height:1.55; text-align:center; }
+    .message { display:none; margin-top:13px; padding:11px 12px; border:1px solid rgba(255,113,133,.2); border-radius:12px; color:#ff9baa; background:rgba(255,113,133,.07); font-size:12px; line-height:1.5; }
+    .message.visible { display:block; }
+    .owner {
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      margin-top:17px; padding:14px 2px 0; border-top:1px solid var(--line);
+    }
+    .owner-label { color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; font-weight:800; }
+    .owner-name { margin-top:4px; font-size:13px; font-weight:750; }
+    .channel {
+      display:inline-flex; align-items:center; justify-content:center; min-height:38px; padding:0 13px;
+      border:1px solid rgba(139,124,255,.25); border-radius:11px; color:#c8c0ff;
+      background:rgba(139,124,255,.09); text-decoration:none; font-size:11px; font-weight:800; white-space:nowrap;
+    }
+    footer { padding:20px 0 0; color:#657184; text-align:center; font-size:10px; }
+    .toast {
+      position:fixed; z-index:5; left:50%; bottom:20px; width:min(calc(100% - 32px),430px);
+      padding:13px 15px; border:1px solid var(--line); border-radius:13px;
+      color:var(--text); background:#182231; box-shadow:0 14px 40px rgba(0,0,0,.4);
+      font-size:12px; line-height:1.45; opacity:0; pointer-events:none; transform:translate(-50%,12px);
+      transition:opacity .2s, transform .2s;
+    }
+    .toast.show { opacity:1; transform:translate(-50%,0); }
+    .toast.error { border-color:rgba(255,113,133,.3); }
+    @media (max-width:360px) {
+      .shell { width:min(100% - 24px,480px); padding-top:24px; }
+      .panel { padding:16px; }
+      .phone-row { grid-template-columns:88px minmax(0,1fr); gap:7px; }
+      .status { padding:7px 8px; font-size:10px; }
+    }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topline">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">✦</div>
+        <div class="brand-copy">
+          <div class="eyebrow">WhatsApp pairing</div>
+          <div class="brand-name" id="brandName"></div>
+        </div>
+      </div>
+      <div class="status" id="serverStatus" aria-live="polite">
+        <span class="dot"></span><span id="statusText">Checking</span>
+      </div>
+    </header>
+
+    <section class="intro">
+      <h1>Connect your<br>WhatsApp account.</h1>
+      <p>Generate a secure pairing code and connect your account to the bot in a few simple steps.</p>
+    </section>
+
+    <section class="stats" aria-label="Live server statistics">
+      <div class="stat"><div class="stat-label">Total users</div><div class="stat-value" id="totalUsers">—</div></div>
+      <div class="stat"><div class="stat-label">Connected sessions</div><div class="stat-value" id="activeSessions">—</div></div>
+      <div class="stat"><div class="stat-label">New today</div><div class="stat-value" id="dailyNew">—</div></div>
+      <div class="stat"><div class="stat-label">Total paired</div><div class="stat-value" id="totalPaired">—</div></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <div class="panel-icon" aria-hidden="true">⌁</div>
+        <h2>Get your pairing code</h2>
+      </div>
+      <p class="panel-sub">Enter the WhatsApp number you want to connect.</p>
+
+      <form id="pairForm" novalidate>
+        <label class="field-label" for="countryCode">WhatsApp number</label>
+        <div class="phone-row">
+          <div class="input-wrap">
+            <span class="prefix">+</span>
+            <input id="countryCode" type="tel" inputmode="numeric" autocomplete="tel-country-code" value="92" aria-label="Country code">
+          </div>
+          <div class="input-wrap">
+            <input id="phoneNumber" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="Phone number" aria-label="Phone number">
+          </div>
+        </div>
+        <p class="hint">Include your country code. Spaces, plus signs and dashes will be removed automatically.</p>
+        <button class="primary" id="submitButton" type="submit"><span id="buttonText">Get Pairing Code</span></button>
+      </form>
+
+      <div class="message" id="inlineMessage" role="alert"></div>
+
+      <section class="result" id="pairResult" aria-live="polite">
+        <div class="result-top">
+          <span class="result-title">Your pairing code</span>
+          <span class="timer" id="countdown">02:00 remaining</span>
+        </div>
+        <div class="code" id="pairCode">XXXX-XXXX</div>
+        <button class="copy" id="copyButton" type="button">Copy pairing code</button>
+        <p class="result-note">Open WhatsApp on your phone, go to Linked Devices, choose Link a Device, then use the phone-number pairing option and enter this code.</p>
+      </section>
+
+      <div class="owner">
+        <div><div class="owner-label">Owner</div><div class="owner-name" id="ownerName"></div></div>
+        <a class="channel" id="channelLink" target="_blank" rel="noopener noreferrer">Join channel ↗</a>
+      </div>
+    </section>
+    <footer>Live server statistics · Secure pairing experience</footer>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = (id) => document.getElementById(id);
+      const apiBase = CONFIG.apiBaseUrl.replace(/\/+$/, "");
+      let countdownInterval = null;
+      let toastTimeout = null;
+
+      $("brandName").textContent = CONFIG.brandName;
+      $("ownerName").textContent = CONFIG.ownerName;
+      $("channelLink").href = CONFIG.channelLink;
+
+      function showToast(message, isError = false) {
+        const toast = $("toast");
+        toast.textContent = message;
+        toast.classList.toggle("error", isError);
+        toast.classList.add("show");
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => toast.classList.remove("show"), 3400);
+      }
+
+      function showMessage(message) {
+        const box = $("inlineMessage");
+        box.textContent = message;
+        box.classList.add("visible");
+      }
+
+      function clearMessage() {
+        $("inlineMessage").textContent = "";
+        $("inlineMessage").classList.remove("visible");
+      }
+
+      async function requestJson(path, options = {}) {
+        const response = await fetch(apiBase + path, {
+          ...options,
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+          }
+        });
+        let data;
+        try {
+          data = await response.json();
+        } catch {
+          throw new Error("The server returned an unreadable response. Please try again.");
+        }
+        if (!response.ok) {
+          const error = new Error(data && data.error ? data.error : "Request failed. Please try again.");
+          error.status = response.status;
+          throw error;
+        }
+        return data;
+      }
+
+      async function checkHealth() {
+        const status = $("serverStatus");
+        try {
+          const data = await requestJson("/api/health");
+          const online = data && data.status === "ok";
+          status.classList.toggle("online", online);
+          status.classList.toggle("offline", !online);
+          $("statusText").textContent = online ? "Online" : "Offline";
+        } catch {
+          status.classList.remove("online");
+          status.classList.add("offline");
+          $("statusText").textContent = "Offline";
+        }
+      }
+
+      async function loadStats() {
+        try {
+          const data = await requestJson("/api/stats");
+          if (!data || data.ok !== true) return;
+          $("totalUsers").textContent = formatStat(data.totalUsers);
+          $("activeSessions").textContent = formatStat(data.activeSessions);
+          $("dailyNew").textContent = formatStat(data.dailyNew);
+          $("totalPaired").textContent = formatStat(data.totalPaired);
+        } catch {
+          // Keep the last successfully displayed values.
+        }
+      }
+
+      function formatStat(value) {
+        return Number.isFinite(Number(value)) ? Number(value).toLocaleString() : "—";
+      }
+
+      function digits(value) {
+        return String(value || "").replace(/\D/g, "");
+      }
+
+      function stopCountdown() {
+        if (countdownInterval !== null) {
+          clearInterval(countdownInterval);
+          countdownInterval = null;
+        }
+      }
+
+      function displayPairingCode(code, expiresIn) {
+        stopCountdown();
+        const cleanCode = String(code || "").replace(/[^a-z0-9]/gi, "").toUpperCase();
+        $("pairCode").textContent = cleanCode.length === 8
+          ? cleanCode.slice(0, 4) + "-" + cleanCode.slice(4)
+          : String(code || "");
+        $("pairResult").classList.add("visible");
+
+        let remaining = Math.max(0, Number(expiresIn) || 0);
+        const update = () => {
+          const minutes = Math.floor(remaining / 60);
+          const seconds = remaining % 60;
+          $("countdown").textContent = remaining > 0
+            ? `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")} remaining`
+            : "Code expired";
+          if (remaining <= 0) {
+            stopCountdown();
+            return;
+          }
+          remaining -= 1;
+        };
+        update();
+        countdownInterval = setInterval(update, 1000);
+      }
+
+      $("pairForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        clearMessage();
+        $("pairResult").classList.remove("visible");
+
+        const country = digits($("countryCode").value);
+        const phone = digits($("phoneNumber").value);
+        const number = country + phone;
+
+        if (number.length < 10 || number.length > 15) {
+          showMessage("Please enter a valid phone number with country code (10–15 digits in total).");
+          return;
+        }
+
+        const button = $("submitButton");
+        button.disabled = true;
+        $("buttonText").textContent = "Generating...";
+        const spinner = document.createElement("span");
+        spinner.className = "spinner";
+        spinner.setAttribute("aria-hidden", "true");
+        button.appendChild(spinner);
+
+        try {
+          const data = await requestJson("/api/pair", {
+            method: "POST",
+            body: JSON.stringify({
+              number,
+              brand: {
+                name: CONFIG.brandName,
+                banner: CONFIG.bannerImageUrl,
+                owner: CONFIG.ownerNumber,
+                ownerName: CONFIG.ownerName,
+                channel: CONFIG.channelLink
+              }
+            })
+          });
+
+          if (!data || !data.code) {
+            throw new Error("Could not generate a pairing code. Please try again.");
+          }
+          displayPairingCode(data.code, data.expiresIn);
+          showToast("Pairing code generated successfully.");
+        } catch (error) {
+          let message = error.message || "Could not reach server, please try again.";
+          if (error instanceof TypeError) {
+            message = "Could not reach server, please try again.";
+          } else if (error.status === 429) {
+            message = error.message || "A pairing is already in progress. Please wait a moment.";
+          } else if (error.status === 503) {
+            message = error.message || "Pairing capacity is full. Please try again later.";
+          } else if (error.status === 500) {
+            message = error.message || "Could not generate a code. Please try again.";
+          } else if (error.status === 400) {
+            message = error.message || "Invalid phone number.";
+          }
+          showMessage(message);
+          showToast(message, true);
+        } finally {
+          button.disabled = false;
+          $("buttonText").textContent = "Get Pairing Code";
+          const loadingIcon = button.querySelector(".spinner");
+          if (loadingIcon) loadingIcon.remove();
+        }
+      });
+
+      $("copyButton").addEventListener("click", async () => {
+        const code = $("pairCode").textContent.replace(/-/g, "");
+        try {
+          await navigator.clipboard.writeText(code);
+          showToast("Pairing code copied.");
+        } catch {
+          const temporary = document.createElement("textarea");
+          temporary.value = code;
+          temporary.style.position = "fixed";
+          temporary.style.opacity = "0";
+          document.body.appendChild(temporary);
+          temporary.select();
+          const copied = document.execCommand("copy");
+          temporary.remove();
+          showToast(copied ? "Pairing code copied." : "Unable to copy. Please select the code manually.", !copied);
+        }
+      });
+
+      checkHealth();
+      loadStats();
+      setInterval(loadStats, 30000);
+    })();
+  </script>
+</body>
+</html>
